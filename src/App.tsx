@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { BusinessScenario, LkmProgressData } from './types/lkm';
 import { DEFAULT_SCENARIOS } from './data/defaultScenarios';
 import { Header } from './components/Header';
+import { LandingHero } from './components/LandingHero';
 import { Phase1Orientation } from './components/Phase1Orientation';
 import { Phase2Organization } from './components/Phase2Organization';
 import { Phase3Investigation } from './components/Phase3Investigation';
@@ -17,6 +18,9 @@ const STORAGE_KEY_PROGRESS = 'lkm_pbl_progress_v2';
 const STORAGE_KEY_SCENARIOS = 'lkm_pbl_scenarios_v1';
 
 export default function App() {
+  // Halaman Depan Landing state
+  const [isLanding, setIsLanding] = useState<boolean>(true);
+
   // Mode Guru vs Siswa state
   const [userRole, setUserRole] = useState<'siswa' | 'guru'>('siswa');
   const [isTeacherAuthenticated, setIsTeacherAuthenticated] = useState<boolean>(() => {
@@ -308,13 +312,28 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleStartQuest = () => {
+    setIsLanding(false);
+    goToPhase(1);
+  };
+
+  const handleGoHome = () => {
+    setIsLanding(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-slate-100/70 text-slate-800 flex flex-col font-sans">
       {/* Top Navigation */}
       <Header
+        isLanding={isLanding}
+        onGoHome={handleGoHome}
         currentPhase={data.currentPhase}
         completedPhases={data.completedPhases}
-        onSelectPhase={(p) => goToPhase(p)}
+        onSelectPhase={(p) => {
+          setIsLanding(false);
+          goToPhase(p);
+        }}
         activeScenario={selectedScenario}
         userRole={userRole}
         onRequestGuruMode={handleRequestGuruMode}
@@ -334,64 +353,77 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        {data.currentPhase === 1 && (
-          <Phase1Orientation
+        {isLanding ? (
+          <LandingHero
+            onStart={handleStartQuest}
             scenarios={scenarios}
-            selectedScenario={selectedScenario}
+            selectedScenarioId={selectedScenarioId}
             onSelectScenario={handleSelectScenario}
-            data={data}
-            onChangeData={setData}
-            onNext={() => goToPhase(2)}
-            onOpenHint={handleOpenHint}
             userRole={userRole}
-            onOpenTeacher={() => setIsTeacherOpen(true)}
+            onRequestGuruMode={handleRequestGuruMode}
           />
-        )}
+        ) : (
+          <>
+            {data.currentPhase === 1 && (
+              <Phase1Orientation
+                scenarios={scenarios}
+                selectedScenario={selectedScenario}
+                onSelectScenario={handleSelectScenario}
+                data={data}
+                onChangeData={setData}
+                onNext={() => goToPhase(2)}
+                onOpenHint={handleOpenHint}
+                userRole={userRole}
+                onOpenTeacher={() => setIsTeacherOpen(true)}
+              />
+            )}
 
-        {data.currentPhase === 2 && (
-          <Phase2Organization
-            selectedScenario={selectedScenario}
-            data={data}
-            onChangeData={setData}
-            onNext={() => goToPhase(3)}
-            onPrev={() => goToPhase(1)}
-            onOpenHint={handleOpenHint}
-          />
-        )}
+            {data.currentPhase === 2 && (
+              <Phase2Organization
+                selectedScenario={selectedScenario}
+                data={data}
+                onChangeData={setData}
+                onNext={() => goToPhase(3)}
+                onPrev={() => goToPhase(1)}
+                onOpenHint={handleOpenHint}
+              />
+            )}
 
-        {data.currentPhase === 3 && (
-          <Phase3Investigation
-            selectedScenario={selectedScenario}
-            data={data}
-            onChangeData={setData}
-            onNext={() => goToPhase(4)}
-            onPrev={() => goToPhase(2)}
-            onOpenHint={handleOpenHint}
-            graphRef={graphRef}
-            userRole={userRole}
-          />
-        )}
+            {data.currentPhase === 3 && (
+              <Phase3Investigation
+                selectedScenario={selectedScenario}
+                data={data}
+                onChangeData={setData}
+                onNext={() => goToPhase(4)}
+                onPrev={() => goToPhase(2)}
+                onOpenHint={handleOpenHint}
+                graphRef={graphRef}
+                userRole={userRole}
+              />
+            )}
 
-        {data.currentPhase === 4 && (
-          <Phase4Presentation
-            selectedScenario={selectedScenario}
-            data={data}
-            onChangeData={setData}
-            onNext={() => goToPhase(5)}
-            onPrev={() => goToPhase(3)}
-            onOpenHint={handleOpenHint}
-          />
-        )}
+            {data.currentPhase === 4 && (
+              <Phase4Presentation
+                selectedScenario={selectedScenario}
+                data={data}
+                onChangeData={setData}
+                onNext={() => goToPhase(5)}
+                onPrev={() => goToPhase(3)}
+                onOpenHint={handleOpenHint}
+              />
+            )}
 
-        {data.currentPhase === 5 && (
-          <Phase5Evaluation
-            selectedScenario={selectedScenario}
-            data={data}
-            onChangeData={setData}
-            onPrev={() => goToPhase(4)}
-            onOpenHint={handleOpenHint}
-            graphRef={graphRef}
-          />
+            {data.currentPhase === 5 && (
+              <Phase5Evaluation
+                selectedScenario={selectedScenario}
+                data={data}
+                onChangeData={setData}
+                onPrev={() => goToPhase(4)}
+                onOpenHint={handleOpenHint}
+                graphRef={graphRef}
+              />
+            )}
+          </>
         )}
       </main>
 
@@ -399,11 +431,11 @@ export default function App() {
       <footer className="mt-auto border-t border-slate-200/80 bg-white py-6 text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-700">LKM Digital Program Linear</span>
+            <span className="font-extrabold text-indigo-700">LinQuest (Linear Quest)</span>
             <span>•</span>
-            <span>Matematika SMA Kelas X</span>
-            <span>•</span>
-            <span>Problem Based Learning (PBL)</span>
+            <span className="italic text-slate-600">Explore, Solve, Optimize!</span>
+            <span className="hidden sm:inline">•</span>
+            <span className="hidden sm:inline">Matematika SMA Kelas X PBL</span>
           </div>
 
           <div className="flex items-center gap-4">

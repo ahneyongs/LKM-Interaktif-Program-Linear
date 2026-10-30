@@ -13,10 +13,13 @@ import {
   ShieldCheck,
   Lock,
   LogOut,
+  Home,
 } from 'lucide-react';
 import { BusinessScenario } from '../types/lkm';
 
 interface HeaderProps {
+  isLanding?: boolean;
+  onGoHome: () => void;
   currentPhase: number;
   completedPhases: number[];
   onSelectPhase: (phase: number) => void;
@@ -40,6 +43,8 @@ const PHASES = [
 ];
 
 export const Header: React.FC<HeaderProps> = ({
+  isLanding = false,
+  onGoHome,
   currentPhase,
   completedPhases,
   onSelectPhase,
@@ -93,25 +98,29 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           {/* Logo & Subject */}
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-sm font-bold text-sm">
-              LKM
+          <button
+            onClick={onGoHome}
+            className="flex items-center gap-3 text-left group hover:opacity-95 transition cursor-pointer"
+            title="Kembali ke Halaman Depan LinQuest"
+          >
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-sm font-black text-sm group-hover:scale-105 transition-transform">
+              LQ
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-sm sm:text-base font-extrabold text-slate-800 tracking-tight">
-                  Menyelesaikan Permasalahan Program Linear
+                <h1 className="text-sm sm:text-base font-extrabold text-slate-800 tracking-tight group-hover:text-indigo-600 transition">
+                  LinQuest <span className="font-semibold text-slate-600">(Linear Quest)</span>
                 </h1>
                 <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
                   Kelas X SMA • PBL
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 hidden sm:block">
-                Permasalahan {activeScenario.groupNumber}:{' '}
+                <span className="font-semibold text-indigo-700">Explore, Solve, Optimize!</span> • Permasalahan {activeScenario.groupNumber}:{' '}
                 <span className="font-semibold text-slate-700">{activeScenario.businessName}</span>
               </p>
             </div>
-          </div>
+          </button>
 
           {/* Mode Switcher & Actions */}
           <div className="flex items-center gap-2 sm:gap-2.5">
@@ -184,18 +193,31 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* 5 PBL Phases Stepper Navigation */}
+        {/* Navigation Stepper */}
         <div className="mt-3 pt-2.5 border-t border-slate-100">
           <nav className="flex items-center justify-between sm:justify-start gap-1 sm:gap-2 overflow-x-auto no-scrollbar py-1">
+            {/* Beranda Button */}
+            <button
+              onClick={onGoHome}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition shrink-0 cursor-pointer ${
+                isLanding
+                  ? 'bg-indigo-600 text-white shadow-xs font-bold'
+                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/60'
+              }`}
+            >
+              <Home className="w-3.5 h-3.5" />
+              <span>Beranda</span>
+            </button>
+
             {PHASES.map((phase) => {
-              const isActive = currentPhase === phase.id;
+              const isActive = !isLanding && currentPhase === phase.id;
               const isCompleted = completedPhases.includes(phase.id);
 
               return (
                 <button
                   key={phase.id}
                   onClick={() => onSelectPhase(phase.id)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium transition shrink-0 ${
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium transition shrink-0 cursor-pointer ${
                     isActive
                       ? 'bg-indigo-600 text-white shadow-xs font-bold'
                       : isCompleted

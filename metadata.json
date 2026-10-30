@@ -1,6 +1,6 @@
 {
   "name": "Menyelesaikan Permasalahan Program Linear",
-  "description": "Website Lembar Kerja Siswa (LKM) interaktif matematika kelas X dengan pendekatan Problem Based Learning (PBL) pada materi Menyelesaikan Permasalahan Program Linear.",
+  "description": "LinQuest (Linear Quest) — Explore, Solve, Optimize! Website Lembar Kerja Siswa (LKM) interaktif matematika kelas X dengan pendekatan Problem Based Learning (PBL) pada materi Menyelesaikan Permasalahan Program Linear.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
